@@ -33,7 +33,30 @@ DeadlineStatusResult calculateDeadlineStatus(Task task, DateTime now) {
       DeadlineStatus.completed,
       'This task is completed.',
     );
-  
+  }
+  final left = task.dueAt.difference(now);
+  if (!left.isNegative && left != Duration.zero) {
+    final reason = 'Due in ${_span(left)}';
+    if (left <= const Duration(hours: 24)) {
+      return DeadlineStatusResult(DeadlineStatus.atRisk, reason);
+    }
+    return DeadlineStatusResult(DeadlineStatus.onTrack, reason);
+  }
+  return DeadlineStatusResult(
+    DeadlineStatus.overdue,
+    'Overdue by ${_span(left.abs())}',
+  );
+}
+
+String _span(Duration d) {
+  if (d.inDays >= 1) return _plural(d.inDays, 'day');
+  if (d.inHours >= 1) return _plural(d.inHours, 'hour');
+  return _plural(d.inMinutes < 1 ? 1 : d.inMinutes, 'minute');
+}
+
+String _plural(int n, String unit) => '$n $unit${n == 1 ? '' : 's'}';
+
+Map<DeadlineStatus, int> countTasksByDeadlineStatus(
   List<Task> tasks,
   DateTime now,
 ) {
