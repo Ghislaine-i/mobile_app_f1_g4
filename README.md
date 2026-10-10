@@ -4,16 +4,16 @@ A Flutter app for one small software team. It stores everything on the device wi
 
 ## Download Android app
 
-[Download the APK](releases/project-task-tracker-v1.0.0.apk) (v1.0.0)
+[Download the APK (v1.0.0)](https://github.com/Ghislaine-i/mobile_app_f1_g4/releases/latest) from the GitHub Releases page.
 
-1. Download the file on your Android phone (or transfer it from a computer).
+1. Download the APK on your Android phone (or transfer it from a computer).
 2. Open the APK and install. Allow installs from unknown sources if Android asks.
 
-To rebuild after code changes:
+To publish a new version after code changes:
 
 ```bash
 flutter build apk --release
-cp build/app/outputs/flutter-apk/app-release.apk releases/project-task-tracker-v1.0.0.apk
+gh release create v1.0.1 build/app/outputs/flutter-apk/app-release.apk --title "Project & Task Tracker v1.0.1" --generate-notes
 ```
 
 ## Features
