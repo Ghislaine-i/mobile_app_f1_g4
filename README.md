@@ -1,17 +1,84 @@
-# mobile_app_f1_g4
+# Project & Task Tracker App — Group F1 G4
 
-A new Flutter project.
+A Flutter app for one small software team. It stores everything on the device with SQLite. No backend is needed.
 
-## Getting Started
+## Download Android app
 
-This project is a starting point for a Flutter application.
+[Download the APK](releases/project-task-tracker-v1.0.0.apk) (v1.0.0)
 
-A few resources to get you started if this is your first Flutter project:
+1. Download the file on your Android phone (or transfer it from a computer).
+2. Open the APK and install. Allow installs from unknown sources if Android asks.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+To rebuild after code changes:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter build apk --release
+cp build/app/outputs/flutter-apk/app-release.apk releases/project-task-tracker-v1.0.0.apk
+```
+
+## Features
+
+- Register with name, role, email and password. Sign in and sign out.
+- Create, edit, delete and assign tasks. Set priority, deadline and status. Add notes.
+- Deadline status badges (Completed, Overdue, At Risk, On Track) with a short reason.
+- Dashboard counts, donut chart, statistics bar chart and upcoming deadlines.
+- Team members with roles and open task counts. Edit your profile.
+
+## Setup
+
+```bash
+flutter pub get
+flutter run
+```
+
+Use an Android emulator or a physical phone (`flutter devices` lists them).
+
+## How it works
+
+### Architecture
+
+```text
+lib/
+├── main.dart        # App entry point
+├── theme.dart       # Shared styling (colors, text, buttons)
+├── models/          # TeamMember, Account, Task, TaskNote
+├── screens/         # Login, register, dashboard, tasks, team, statistics, profile
+├── services/        # database, authentication, deadline status rules
+└── widgets/         # Shared UI helpers and dialogs
+```
+
+### Local storage
+
+- SQLite file `tracker.db` with three tables: `team_members`, `accounts`, `tasks`.
+- Passwords are hashed with PBKDF2-HMAC-SHA256 (600,000 rounds, random 16-byte salt). Hashing runs in a separate isolate so the screen stays smooth.
+- The logged-in user is kept in memory only. Each launch starts at the sign-in screen.
+- Three fictional team members are added when the database is first created. No passwords are seeded.
+
+### Deadline status rules
+
+Applied in this order, with one shared function (`lib/services/deadline_status.dart`):
+
+1. Workflow is Completed: **Completed**.
+2. Deadline is now or in the past: **Overdue**.
+3. Deadline is within the next 24 hours (inclusive): **At Risk**.
+4. Otherwise: **On Track**.
+
+The deadline is the start of the day after the chosen due date. So a task due today is At Risk for most of the day.
+
+## Checks
+
+```bash
+dart format lib test
+flutter analyze
+flutter test
+```
+
+Tests cover the deadline status boundaries, registration, sign in, hashing and basic database actions. They use throw-away in-memory databases.
+
+## Team & Task Division
+
+| Member | Role | Contributions |
+|---|---|---|
+| Kabera Nshuti Samuel | Project setup & integration | Initialized the repo and Flutter project, built the app entry point (`main.dart`) and shared theme, reviewed and merged the team's PRs, repo maintenance and test suite |
+| INEZA M. Ghislaine | Screens & services | Built the core screen layouts (login, register, dashboard, tasks, team, statistics, profile), the SQLite database service, authentication service, and deadline status tracking |
+| Noella Uwera | Models & UI | Created the data models (`TeamMember`, `Account`, `Task`, `TaskNote`), shared UI helper widgets, and the team member management screens |
